@@ -385,6 +385,11 @@
 }
 // Called after the user changes the selection.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if ([self.myDelegate respondsToSelector:@selector(tableView:didClickSection:)]) {
+        [self.myDelegate tableView:self didClickSection:indexPath.section];
+    }
+    
     NSNumber *key = @(indexPath.section);
     if ([self.expandableSectionsDictionary[key] boolValue]) {
         // section is expandable
