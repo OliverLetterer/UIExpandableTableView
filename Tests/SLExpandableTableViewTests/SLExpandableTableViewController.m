@@ -94,7 +94,7 @@
         _firstSectionStrings = @[ @"Section 0 Row 0", @"Section 0 Row 1", @"Section 0 Row 2", @"Section 0 Row 3" ];
         _secondSectionStrings = @[ @"Section 1 Row 0", @"Section 1 Row 1", @"Section 1 Row 2", @"Section 1 Row 3" ];
 
-        _sectionsArray = @[ _firstSectionStrings, _secondSectionStrings ];
+        _sectionsArray = @[ _firstSectionStrings, _secondSectionStrings, /* dummy */[NSArray array] ];
         _expandableSections = [NSMutableIndexSet indexSet];
     }
     return self;
@@ -140,7 +140,7 @@
         cell = [[SLExpandableTableViewControllerHeaderCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
     }
 
-    cell.textLabel.text = [NSString stringWithFormat:@"Section %d", section];
+    cell.textLabel.text = [NSString stringWithFormat:@"Section %ld", (long)section];
 
     return cell;
 }
@@ -158,6 +158,12 @@
 - (void)tableView:(SLExpandableTableView *)tableView didCollapseSection:(NSUInteger)section animated:(BOOL)animated
 {
     [self.expandableSections removeIndex:section];
+}
+
+- (void)tableView:(SLExpandableTableView *)tableView didClickSection:(NSUInteger)section
+{
+    // Delegate for mixing expandable cell and non-expandable cell
+    NSLog(@"click: %lu", (unsigned long)section);
 }
 
 #pragma mark - UITableViewDataSource
