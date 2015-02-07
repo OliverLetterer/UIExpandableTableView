@@ -44,8 +44,10 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
 }
 
 - (void)setDelegate:(id<SLExpandableTableViewDelegate>)delegate {
-    _myDelegate = delegate;
-    [super setDelegate:self];
+    if (delegate != nil){
+        _myDelegate = delegate;
+        [super setDelegate:self];
+    }
 }
 
 - (id<UITableViewDataSource>)dataSource {
