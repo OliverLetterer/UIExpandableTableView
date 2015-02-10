@@ -7,7 +7,6 @@
 //
 
 #import "SLExpandableTableViewController.h"
-#import <SLExpandableTableView.h>
 
 @interface SLExpandableTableViewControllerHeaderCell : UITableViewCell <UIExpandingTableViewCell>
 
@@ -69,12 +68,12 @@
 @end
 
 
-@interface SLExpandableTableViewController () <SLExpandableTableViewDatasource, SLExpandableTableViewDelegate>
+@interface SLExpandableTableViewController ()
 
 @property (nonatomic, strong) NSArray *firstSectionStrings;
 @property (nonatomic, strong) NSArray *secondSectionStrings;
 
-@property (nonatomic, strong) NSArray *sectionsArray;
+@property (nonatomic, strong) NSMutableArray *sectionsArray;
 
 @property (nonatomic, strong) NSMutableIndexSet *expandableSections;
 
@@ -92,9 +91,9 @@
 {
     if (self = [super initWithStyle:style]) {
         _firstSectionStrings = @[ @"Section 0 Row 0", @"Section 0 Row 1", @"Section 0 Row 2", @"Section 0 Row 3" ];
-        _secondSectionStrings = @[ @"Section 1 Row 0", @"Section 1 Row 1", @"Section 1 Row 2", @"Section 1 Row 3" ];
+        _secondSectionStrings = @[ @"Section 1 Row 0", @"Section 1 Row 1", @"Section 1 Row 2", @"Section 1 Row 3", @"Section 1 Row 4" ];
 
-        _sectionsArray = @[ _firstSectionStrings, _secondSectionStrings ];
+        _sectionsArray = @[ _firstSectionStrings, _secondSectionStrings ].mutableCopy;
         _expandableSections = [NSMutableIndexSet indexSet];
     }
     return self;
@@ -140,7 +139,7 @@
         cell = [[SLExpandableTableViewControllerHeaderCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
     }
 
-    cell.textLabel.text = [NSString stringWithFormat:@"Section %d", section];
+    cell.textLabel.text = [NSString stringWithFormat:@"Section %ld", (long)section];
 
     return cell;
 }
@@ -195,6 +194,19 @@
     cell.textLabel.text = dataArray[indexPath.row - 1];
 
     return cell;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) {
+        [self.sectionsArray removeObjectAtIndex:indexPath.section];
+        [tableView deleteSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
 }
 
 #pragma mark - UITableViewDelegate
