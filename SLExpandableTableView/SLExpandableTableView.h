@@ -51,6 +51,8 @@ typedef enum {
 - (void)tableView:(SLExpandableTableView *)tableView willCollapseSection:(NSUInteger)section animated:(BOOL)animated;
 - (void)tableView:(SLExpandableTableView *)tableView didCollapseSection:(NSUInteger)section animated:(BOOL)animated;
 
+- (BOOL)tableView:(SLExpandableTableView *)tableView shouldAnimateScrollToSection:(NSUInteger)section;
+
 @end
 
 
