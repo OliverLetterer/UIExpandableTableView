@@ -385,12 +385,39 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
             // expand cell got clicked
             if ([self.myDataSource tableView:self needsToDownloadDataForExpandableSection:indexPath.section]) {
                 // we need to download some data first
-                [self downloadDataInSection:indexPath.section];
+                if ([self.myDelegate respondsToSelector:@selector(tableView:shouldExpandSection:animated:)]) {
+                    BOOL shouldExpand = [self.myDelegate tableView:self shouldExpandSection:indexPath.section animated:YES];
+                    if (shouldExpand) {
+                        [self downloadDataInSection:indexPath.section];
+                    } else {
+                        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+                    }
+                } else {
+                    [self downloadDataInSection:indexPath.section];
+                }
             } else {
                 if ([self.showingSectionsDictionary[key] boolValue]) {
-                    [self collapseSection:indexPath.section animated:YES];
+                    if ([self.myDelegate respondsToSelector:@selector(tableView:shouldCollapseSection:animated:)]) {
+                        BOOL shouldCollapse = [self.myDelegate tableView:self shouldCollapseSection:indexPath.section animated:YES];
+                        if (shouldCollapse) {
+                            [self collapseSection:indexPath.section animated:YES];
+                        } else {
+                            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+                        }
+                    } else {
+                        [self collapseSection:indexPath.section animated:YES];
+                    }
                 } else {
-                    [self expandSection:indexPath.section animated:YES];
+                    if ([self.myDelegate respondsToSelector:@selector(tableView:shouldExpandSection:animated:)]) {
+                        BOOL shouldExpand = [self.myDelegate tableView:self shouldExpandSection:indexPath.section animated:YES];
+                        if (shouldExpand) {
+                            [self expandSection:indexPath.section animated:YES];
+                        } else{
+                            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+                        }
+                    } else {
+                        [self expandSection:indexPath.section animated:YES];
+                    }
                 }
             }
         } else {
