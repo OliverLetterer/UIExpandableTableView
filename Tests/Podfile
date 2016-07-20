@@ -1,3 +1,5 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
 xcodeproj 'SLExpandableTableViewTests'
 workspace '../SLExpandableTableViewTests'
 inhibit_all_warnings!
@@ -9,5 +11,5 @@ pod 'SLExpandableTableView', path: '../'
 target 'Tests', :exclusive => true do
   pod 'OCMock', '~> 3.1.1'
   pod 'Expecta', '~> 0.3.1'
-  pod 'KIF', '~> 3.0.8'
+  pod 'KIF', '~> 3.4.1'
 end

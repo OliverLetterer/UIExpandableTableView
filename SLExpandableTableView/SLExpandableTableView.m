@@ -132,6 +132,7 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
     self.downloadingSectionsDictionary = [NSMutableDictionary dictionary];
     self.animatingSectionsDictionary = [NSMutableDictionary dictionary];
     self.reloadAnimation = UITableViewRowAnimationFade;
+    self.performSectionClosingAnimation = YES;
 }
 
 - (void)awakeFromNib
@@ -248,13 +249,16 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
 
     [self.animatingSectionsDictionary removeObjectForKey:@(section)];
 
+    __weak typeof(self) weakSelf = self;
     void(^completionBlock)(void) = ^{
-        if ([self respondsToSelector:@selector(scrollViewDidScroll:)]) {
-            [self scrollViewDidScroll:self];
+        typeof(weakSelf) strongSelf = weakSelf;
+
+        if ([strongSelf respondsToSelector:@selector(scrollViewDidScroll:)]) {
+            [strongSelf scrollViewDidScroll:strongSelf];
         }
 
-        if ([self.myDelegate respondsToSelector:@selector(tableView:didExpandSection:animated:)]) {
-            [self.myDelegate tableView:self didExpandSection:section animated:animated];
+        if ([strongSelf.myDelegate respondsToSelector:@selector(tableView:didExpandSection:animated:)]) {
+            [strongSelf.myDelegate tableView:strongSelf didExpandSection:section animated:animated];
         }
     };
 
@@ -306,17 +310,22 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
 
     [self.animatingSectionsDictionary removeObjectForKey:@(section)];
 
-    [self scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]
-                atScrollPosition:UITableViewScrollPositionTop
-                        animated:animated];
+    if (self.performSectionClosingAnimation) {
+        [self scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]
+                    atScrollPosition:UITableViewScrollPositionTop
+                            animated:animated];
+    }
 
+    __weak typeof(self) weakSelf = self;
     void(^completionBlock)(void) = ^{
-        if ([self respondsToSelector:@selector(scrollViewDidScroll:)]) {
-            [self scrollViewDidScroll:self];
+        typeof(weakSelf) strongSelf = weakSelf;
+        
+        if (strongSelf.performSectionClosingAnimation && [strongSelf respondsToSelector:@selector(scrollViewDidScroll:)]) {
+            [strongSelf scrollViewDidScroll:strongSelf];
         }
 
-        if ([self.myDelegate respondsToSelector:@selector(tableView:didCollapseSection:animated:)]) {
-            [self.myDelegate tableView:self didCollapseSection:section animated:animated];
+        if ([strongSelf.myDelegate respondsToSelector:@selector(tableView:didCollapseSection:animated:)]) {
+            [strongSelf.myDelegate tableView:strongSelf didCollapseSection:section animated:animated];
         }
     };
 

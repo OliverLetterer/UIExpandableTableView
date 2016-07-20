@@ -86,6 +86,11 @@ typedef enum {
 @property (nonatomic, assign) NSInteger maximumRowCountToStillUseAnimationWhileExpanding;
 
 @property (nonatomic, assign) BOOL onlyDisplayHeaderAndFooterViewIfTableViewIsNotEmpty;
+/**
+ * Defines whether the tableView should perform scroll after closing the 
+ * section. Default: YES.
+ */
+@property (nonatomic) BOOL performSectionClosingAnimation;
 
 @property (nonatomic, assign) UITableViewRowAnimation reloadAnimation;
 
