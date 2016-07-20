@@ -244,13 +244,16 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
 
     [self.animatingSectionsDictionary removeObjectForKey:@(section)];
 
+    __weak typeof(self) weakSelf = self;
     void(^completionBlock)(void) = ^{
-        if ([self respondsToSelector:@selector(scrollViewDidScroll:)]) {
-            [self scrollViewDidScroll:self];
+        typeof(weakSelf) strongSelf = weakSelf;
+
+        if ([strongSelf respondsToSelector:@selector(scrollViewDidScroll:)]) {
+            [strongSelf scrollViewDidScroll:strongSelf];
         }
 
-        if ([self.myDelegate respondsToSelector:@selector(tableView:didExpandSection:animated:)]) {
-            [self.myDelegate tableView:self didExpandSection:section animated:animated];
+        if ([strongSelf.myDelegate respondsToSelector:@selector(tableView:didExpandSection:animated:)]) {
+            [strongSelf.myDelegate tableView:strongSelf didExpandSection:section animated:animated];
         }
     };
 
