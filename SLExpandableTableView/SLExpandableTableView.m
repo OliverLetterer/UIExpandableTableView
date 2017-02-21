@@ -231,8 +231,12 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
         [self beginUpdates];
 
         UITableViewCell<UIExpandingTableViewCell> *cell = (UITableViewCell<UIExpandingTableViewCell> *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
-        cell.loading = NO;
-        [cell setExpansionStyle:UIExpansionStyleExpanded animated:YES];
+        if ([cell respondsToSelector:@selector(setLoading:)]) {
+            cell.loading = NO;
+        }
+        if ([cell respondsToSelector:@selector(setExpansionStyle:animated:)]) {
+            [cell setExpansionStyle:UIExpansionStyleExpanded animated:YES];
+        }
 
         NSMutableArray *insertArray = [NSMutableArray array];
         for (int i = 1; i < newRowCount; i++) {
@@ -289,9 +293,12 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
         [self beginUpdates];
 
         UITableViewCell<UIExpandingTableViewCell> *cell = (UITableViewCell<UIExpandingTableViewCell> *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
-        cell.loading = NO;
-        [cell setExpansionStyle:UIExpansionStyleCollapsed animated:YES];
-
+        if ([cell respondsToSelector:@selector(setLoading:)]) {
+            cell.loading = NO;
+        }
+        if ([cell respondsToSelector:@selector(setExpansionStyle:animated:)]) {
+            [cell setExpansionStyle:UIExpansionStyleCollapsed animated:YES];
+        }
         NSMutableArray *deleteArray = [NSMutableArray array];
         for (int i = 1; i < newRowCount; i++) {
             [deleteArray addObject:[NSIndexPath indexPathForRow:i inSection:section] ];
@@ -306,9 +313,12 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
 
     [self.animatingSectionsDictionary removeObjectForKey:@(section)];
 
-    [self scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]
-                atScrollPosition:UITableViewScrollPositionTop
-                        animated:animated];
+    // By default the header cell is already on screen when it's collapsed.
+    // If a user wants to programatically collapse a section, they should handle scrolling themselves
+    // If you disagree feel free to uncomment this :)
+//    [self scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]
+//                atScrollPosition:UITableViewScrollPositionTop
+//                        animated:animated];
 
     void(^completionBlock)(void) = ^{
         if ([self respondsToSelector:@selector(scrollViewDidScroll:)]) {
@@ -442,13 +452,19 @@ static BOOL protocol_containsSelector(Protocol *protocol, SEL selector)
         if (indexPath.row == 0) {
             UITableViewCell<UIExpandingTableViewCell> *cell = [self.myDataSource tableView:self expandingCellForSection:indexPath.section];
             if ([self.downloadingSectionsDictionary[key] boolValue]) {
-                [cell setLoading:YES];
+                if ([cell respondsToSelector:@selector(setLoading:)]) {
+                     [cell setLoading:YES];
+                }
             } else {
-                [cell setLoading:NO];
-                if ([self.showingSectionsDictionary[key] boolValue]) {
-                    [cell setExpansionStyle:UIExpansionStyleExpanded animated:NO];
-                } else {
-                    [cell setExpansionStyle:UIExpansionStyleCollapsed animated:NO];
+                if ([cell respondsToSelector:@selector(setLoading:)]) {
+                    [cell setLoading:NO];
+                }
+                if ([cell respondsToSelector:@selector(setExpansionStyle:animated:)]) {
+                    if ([self.showingSectionsDictionary[key] boolValue]) {
+                        [cell setExpansionStyle:UIExpansionStyleExpanded animated:NO];
+                    } else {
+                        [cell setExpansionStyle:UIExpansionStyleCollapsed animated:NO];
+                    }
                 }
             }
             return cell;
